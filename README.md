@@ -1,4 +1,5 @@
 # FexChat
+<img src="image/FexChat.png">
 
 **FexChat** is a private, unmoderated chat system designed for secure and confidential communication. The application is designed to be used in environments where privacy is paramount and censorship is minimal. FexChat enables users to host their own servers and maintain control over the chat environment, ensuring that conversations are only visible to invited parties.
 
