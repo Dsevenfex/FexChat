@@ -1,0 +1,7 @@
+Big baner:
+height 600px
+width 250px
+-
+Mini baner:
+height 250px
+width 250px

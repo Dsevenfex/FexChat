@@ -1,0 +1,142 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: "Courier New", Courier, monospace; 
+}
+
+body {
+    background-color: #000; 
+    height: 100vh;
+    overflow: hidden;
+    color: #ddd;
+}
+
+.register-card {
+    width: 100%;
+    max-width: 400px;
+    margin: 100px auto;
+    background-color: #2e003e; 
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+}
+
+.register-card h2 {
+    color: #fff;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    color: #ddd;
+    font-size: 1rem;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group .input {
+    width: 100%;
+    padding: 10px;
+    background-color: #1a0024;
+    border: 1px solid #6a0dad;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+}
+
+.form-group .input:focus {
+    border-color: #00ff00;
+}
+
+.submit-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #6a0dad;
+    border: 1px solid #6a0dad;
+    color: #fff;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+.submit-button:hover {
+    background-color: #550b87;
+}
+
+.bottom-link {
+    text-align: center;
+    margin-top: 10px;
+    color: #ddd;
+}
+
+.bottom-link a {
+    color: #6a0dad;
+    text-decoration: none;
+}
+
+.bottom-link a:hover {
+    color: #ff69b4;
+}
+
+.register-card::-webkit-scrollbar { width: 10px; background: #1a0024; }
+.register-card::-webkit-scrollbar-thumb { background: #6a0dad; border: 1px solid white; }
+.flashed-messages {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 100%;
+    max-width: 400px;
+    z-index: 9999;
+}
+
+.flashed-messages li {
+    padding: 10px;
+    margin-bottom: 10px;
+    border-radius: 5px;
+    text-align: center;
+    color: white;
+}
+
+.flashed-messages .success {
+    background-color: #4CAF50; 
+}
+
+.flashed-messages .danger {
+    background-color: #f44336;
+}
+
+.flashed-messages .info {
+    background-color: #2196F3; 
+}
+.flashed-messages {
+    list-style-type: none;
+    padding: 0;
+}
+
+.flashed-messages li {
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+}
+
+.flashed-messages .danger {
+    background-color: #f8d7da;
+    color: #721c24;
+}
+
+.flashed-messages .success {
+    background-color: #d4edda;
+    color: #155724;
+}

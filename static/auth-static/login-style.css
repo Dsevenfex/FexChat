@@ -1,0 +1,91 @@
+* {
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+    font-family: "Courier New", Courier, monospace; 
+}
+
+body {
+    background-color: #000; 
+    height: 100vh;
+    overflow: hidden; 
+    color: #ddd;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 400px;
+    margin: 100px auto;
+    background-color: #2e003e; 
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
+}
+
+.login-card h2 {
+    color: #fff;
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 1.5rem;
+}
+
+.form-group {
+    margin-bottom: 15px;
+}
+
+.form-group label {
+    color: #ddd;
+    font-size: 1rem;
+    display: block;
+    margin-bottom: 5px;
+}
+
+.form-group .input {
+    width: 100%;
+    padding: 10px;
+    background-color: #1a0024;
+    border: 1px solid #6a0dad;
+    border-radius: 5px;
+    color: #fff;
+    font-size: 1rem;
+    outline: none;
+}
+
+.form-group .input:focus {
+    border-color: #00ff00;
+}
+
+.submit-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #6a0dad;
+    border: 1px solid #6a0dad;
+    color: #fff;
+    font-size: 1rem;
+    border-radius: 5px;
+    cursor: pointer;
+    text-transform: uppercase;
+}
+
+.submit-button:hover {
+    background-color: #550b87;
+}
+
+.bottom-link {
+    text-align: center;
+    margin-top: 10px;
+    color: #ddd;
+}
+
+.bottom-link a {
+    color: #6a0dad;
+    text-decoration: none;
+}
+
+.bottom-link a:hover {
+    color: #ff69b4;
+}
+
+.login-card::-webkit-scrollbar { width: 10px; background: #1a0024; }
+.login-card::-webkit-scrollbar-thumb { background: #6a0dad; border: 1px solid white; }
+

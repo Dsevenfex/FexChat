@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FexChat</title>
+    <link rel="stylesheet" href="{{url_for('static',filename='styles.css')}}" />
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;700&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="app-container">
+        <main class="chat-section">
+            <div class="chat-header">
+                <h2 class="server-msg">Clean your hate-filled heart!</h2>
+                <div class="users-list">
+                    Current chatter(s):
+                    {% for chatter in chatters %}
+                        <span class="{{ chatter.custom_color_class or 'u-blue' }}">
+                            {{ chatter.username }}
+                        </span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <div class="messages-log" id="messageLog">
+                {% for post in posts %}
+                    <div class="line{% if post.is_command %} command-line{% endif %}" data-post-id="{{ post.id }}">
+                        <span class="time">{{ post.created_at.strftime('%Y-%m-%d %H:%M') }}</span>
+                        - <span class="{{ 'u-system' if post.is_system else post.author.custom_color_class if post.author else 'u-admin' }}">
+
+
+                            {{ post.author.username if post.author else 'SYSTEM' }}</span>: {{ post.user_message | e }}
+                    </div>
+                {% endfor %}
+            </div>
+
+            <form class="post-form" action="{{ url_for('upload_post') }}" method="POST" enctype="multipart/form-data">
+                <div class="bottom-controls">
+                    <div class="input-group">
+                        <span class="label">plug:</span>
+                        {{ form.message(type="text", class="main-input", placeholder="Type command...", autofocus=true, id="messageInput") }}
+                        <select class="target-select">
+                            <option>To: Current</option>
+                            <option>To: All</option>
+                        </select>
+                        {{ form.post_submit(class="btn-primary") }}
+                    </div>
+                    <div class="action-buttons">
+                        <button type="button" class="btn-secondary" onclick="window.location.reload()">Reload</button>
+                        <button type="button" class="btn-secondary">Clear Last</button>
+                        <button type="button" class="btn-secondary" onclick="document.getElementById('messageInput').value='/clear'; document.querySelector('.post-form').requestSubmit();">Clear All</button>
+                        <div class="spacer"></div>
+                        <button type="button" class="btn-danger" onclick="window.location.href='{{ url_for('logout') }}'">EXIT</button>
+                    </div>
+                </div>
+            </form>
+        </main>
+<aside class="ads-section">
+    <div class="ad-banner mini">
+        <img src="../static/banner-img/mini_baner_250x250px.png" alt="Mini Banner">
+    </div>
+    <div class="ad-banner big">
+        <img src="../static/banner-img/big_baner_250x600px.png" alt="Big Banner">
+    </div>
+ 
+</aside>
+    </div>
+
+    <script>
+        let lastPostId = 0;
+        const POLLING_INTERVAL = 2000;
+        let COMMAND_TIMEOUT_MS = 0; // /settimeout
+        let lastPostTime = Date.now(); 
+
+        function scrollToBottom() {
+            const messagesLog = document.getElementById('messageLog');
+            messagesLog.scrollTop = messagesLog.scrollHeight;
+        }
+
+        function addNewMessage(username, message, role, postId, colorClass, isCommand = false) { 
+    const messagesLog = document.getElementById('messageLog');
+    const newMessage = document.createElement('div');
+    newMessage.classList.add('line');
+
+    if (postId) {
+        newMessage.dataset.postId = postId;
+        lastPostId = postId;
+    }
+
+    if (isCommand) {
+        newMessage.classList.add('command-line');
+    }
+
+    const now = new Date();
+    const timeStr = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+
+    const messageTextNode = document.createTextNode(message);
+
+    // Log to check what color class is being passed
+    console.log("Author color class:", colorClass); 
+
+    // Use provided `colorClass` or fallback to default
+    const userClass = colorClass || 'u-blue'; 
+
+    newMessage.innerHTML = `
+        <span class="time">${timeStr}</span>
+        - <span class="${userClass}">${username}</span>: 
+    `;
+    newMessage.appendChild(messageTextNode);
+
+    messagesLog.appendChild(newMessage);
+
+    setTimeout(() => {
+        scrollToBottom();
+    }, 50);
+}
+
+
+        function initializeLastPostId() {
+            const messages = document.querySelectorAll('#messageLog .line[data-post-id]');
+            if (messages.length > 0) {
+                const lastMessage = messages[messages.length - 1];
+                lastPostId = parseInt(lastMessage.dataset.postId) || 0;
+            }
+        }
+
+        function pollNewPosts() {
+    fetch(`/get_new_posts/${lastPostId}`)
+        .then(response => response.json())
+        .then(data => {
+            if (data.posts && data.posts.length > 0) {
+                data.posts.forEach(post => {
+                    addNewMessage(
+                        post.author_username,
+                        post.user_message,
+                        post.author_role,
+                        post.id,
+                        post.author_color, // colorClass
+                        post.is_command // isCommand
+                    );
+                });
+            }
+        })
+        .catch(error => console.error('Error fetching new posts:', error));
+
+    setTimeout(pollNewPosts, POLLING_INTERVAL);
+}
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initializeLastPostId();
+            scrollToBottom();
+
+            pollNewPosts();
+
+            const postForm = document.querySelector('.post-form');
+            const messageInput = document.getElementById('messageInput');
+
+            postForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const message = messageInput.value.trim();
+                if (!message) return;
+
+                const now = Date.now();
+                if (COMMAND_TIMEOUT_MS > 0 && (message.charAt(0) !== '/') && (now - lastPostTime < COMMAND_TIMEOUT_MS)) {
+                    const remaining = ((COMMAND_TIMEOUT_MS - (now - lastPostTime)) / 1000).toFixed(1);
+                    alert(`Please wait ${remaining} seconds (Timeout active).`);
+                    return;
+                }
+
+                messageInput.disabled = true;
+
+                fetch(postForm.action, {
+                    method: 'POST',
+                    body: new URLSearchParams({
+                        message: message
+                    }),
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded'
+                    }
+                })
+                .then(response => {
+                    if (response.status === 429 || response.status === 403) {
+                        return response.json().then(data => {
+                            throw new Error(data.error);
+                        });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+
+                        if (data.command === 'clear_log') {
+                            document.getElementById('messageLog').innerHTML = '';
+                            alert('Chat log cleared!');
+                            return;
+                        }
+
+                        if (data.command === 'set_timeout') {
+                            COMMAND_TIMEOUT_MS = data.value * 1000;
+                            alert(`Chat timeout set to ${data.value} seconds!`);
+                            return;
+                        }
+
+                        addNewMessage(
+                            data.author_username,
+                            data.user_message,
+                            data.author_role,
+                            data.post_id,
+                            data.author_color, // colorClass
+                            data.is_command // isCommand
+                        );
+                        messageInput.value = '';
+                        lastPostTime = Date.now();
+
+                    } else {
+                        console.error("Error posting message:", data.error);
+                        alert("Error: " + data.error);
+                    }
+                })
+                .catch(error => {
+                    console.error('Network error or server error:', error);
+                    alert('Error: ' + error.message);
+                })
+                .finally(() => {
+                    messageInput.disabled = false;
+                    messageInput.focus();
+                });
+            });
+        });
+    </script>
+</body>
+
+</html>
